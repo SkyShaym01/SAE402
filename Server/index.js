@@ -38,9 +38,9 @@ myDB
     console.log("Database synchronized");
 
     app.listen(PORT, () => {
-      console.log(`Server run on http://localhost:${PORT}`);x
+      console.log(`Server run on http://localhost:${PORT}`);
+    });
   })
   .catch((error) => {
     console.error("Failed to synchronize database:", error);
   });
-})

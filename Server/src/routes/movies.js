@@ -30,4 +30,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// get a random movie
+
+
 module.exports = router;

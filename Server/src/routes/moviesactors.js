@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { MoviesActors } = require("../sgbd/models.js");
 
-// get all actor
+// get all actor-movies relations
 router.get("/", async (req, res) => {
   try {
     const actors = await MoviesActors.findAll();
@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// get actor by id
+// get actor-movies relation by id
 router.get("/:id", async (req, res) => {
   try {
     const actor = await MoviesActors.findByPk(req.params.id);

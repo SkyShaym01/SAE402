@@ -1,4 +1,5 @@
 const express = require("express");
+const sequelize = require("sequelize");
 const router = express.Router();
 const { Actors } = require("../sgbd/models.js");
 
@@ -27,6 +28,26 @@ router.get("/:id", async (req, res) => {
   } catch (error) {
     console.error("Error fetching actor:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+// get a random actor
+router.get('/random', async (req, res) => {
+  try {
+    const randomActor = await Actors.findOne({
+      attributes: ['name'],
+      order: sequelize.random() // Using the sequelize import you already have
+    });
+
+    if (randomActor) {
+      res.json({ actor: randomActor.name });
+    } else {
+      res.status(404).json({ error: 'No actors found' });
+    }
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
