@@ -50,39 +50,54 @@ const Movies = myDB.define(
       type: Sequelize.INTEGER,
       primaryKey: true,
     },
-    year: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-    },
   },
   { timestamps: false }
 );
 
 const MoviesActors = myDB.define(
-  "win",
+  "moviesactors",
   {
-    championship_id: {
+    id_movie: {
       type: Sequelize.STRING,
       primaryKey: true,
       references: {
-        model: Championship,
+        model: Movies,
         key: "id",
       },
     },
-    winner_id: {
-      type: Sequelize.INTEGER,
+    id_actor: {
+      type: Sequelize.STRING,
       primaryKey: true,
       references: {
-        model: Player,
+        model: Actors,
         key: "id",
       },
-    },
-    year: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
     },
   },
   { timestamps: false }
 );
 
-module.exports = { Player, Championship, Play, Win };
+const MoviesGenres = myDB.define(
+  "moviesgenres",
+  {
+    id_movie: {
+      type: Sequelize.STRING,
+      primaryKey: true,
+      references: {
+        model: Movies,
+        key: "id",
+      },
+    },
+    id_genre: {
+      type: Sequelize.STRING,
+      primaryKey: true,
+      references: {
+        model: Genres,
+        key: "id",
+      },
+    },
+  },
+  { timestamps: false }
+);
+
+module.exports = { Actors, Genres, Movies, MoviesActors, MoviesGenres };

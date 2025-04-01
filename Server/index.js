@@ -5,10 +5,11 @@ var cors = require('cors');
 const myDB = require("./src/sgbd/config.js");
 require("./src/sgbd/models.js");
 
-const routerPlayers = require("./src/routes/player.js");
-const routerChampionships = require("./src/routes/championship");
-const routerWins = require("./src/routes/win");
-const routerPlays = require("./src/routes/plays");
+const routerActors = require("./src/routes/actors.js");
+const routerMovies = require("./src/routes/movies.js");
+const routerGenres = require("./src/routes/genres.js");
+const routerMoviesActors = require("./src/routes/moviesactors.js");
+const routerMoviesGenres = require("./src/routes/moviesgenres.js");
 
 const app = express();
 
@@ -19,8 +20,11 @@ app.get("/", function (req, res) {
   res.send("Hello World");
 });
 
-app.use("/players", routerPlayers); //a changer
-
+app.use("/actors", routerActors);
+app.use("/movies", routerMovies);
+app.use("/genres", routerGenres);
+app.use("/moviesactors", routerMoviesActors);
+app.use("/moviesgenres", routerMoviesActors);
 
 const PORT = process.env.PORT || 3000;
 
@@ -34,9 +38,9 @@ myDB
     console.log("Database synchronized");
 
     app.listen(PORT, () => {
-      console.log(`Server run on http://localhost:${PORT}`);
-    });
+      console.log(`Server run on http://localhost:${PORT}`);x
   })
   .catch((error) => {
     console.error("Failed to synchronize database:", error);
   });
+})
