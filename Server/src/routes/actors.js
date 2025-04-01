@@ -33,22 +33,6 @@ router.get("/:id", async (req, res) => {
 
 
 // get a random actor
-router.get('/random', async (req, res) => {
-  try {
-    const randomActor = await Actors.findOne({
-      attributes: ['name'],
-      order: sequelize.random() // Using the sequelize import you already have
-    });
 
-    if (randomActor) {
-      res.json({ actor: randomActor.name });
-    } else {
-      res.status(404).json({ error: 'No actors found' });
-    }
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
 
 module.exports = router;
