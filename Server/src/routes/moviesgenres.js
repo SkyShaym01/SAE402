@@ -1,4 +1,5 @@
 const express = require("express");
+const sequelize = require("sequelize");
 const router = express.Router();
 const { MoviesGenres } = require("../sgbd/models.js");
 

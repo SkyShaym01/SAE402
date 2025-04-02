@@ -9,11 +9,29 @@ router.get("/", async (req, res) => {
     const actors = await Actors.findAll();
     res.json({
       message: "All Actors",
-      date: actors
+      date: actors,
     });
   } catch (error) {
     console.error("Error fetching actors:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get('/random', async (req, res) => {
+  try {
+      const randomActor = await Actors.findOne({
+          order: sequelize.literal('RAND()'),
+          attributes: ['id', 'name']
+      });
+      
+      if (!randomActor) {
+          return res.status(404).json({ error: 'No actors found' });
+      }
+      
+      res.json(randomActor);
+  } catch (err) {
+      console.error('Error fetching random actor:', err);
+      res.status(500).json({ error: 'Failed to fetch random actor' });
   }
 });
 
@@ -30,9 +48,5 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
-// get a random actor
-
 
 module.exports = router;

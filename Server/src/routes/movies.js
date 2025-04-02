@@ -1,4 +1,5 @@
 const express = require("express");
+const sequelize = require("sequelize");
 const router = express.Router();
 const { Movies } = require("../sgbd/models.js");
 
@@ -16,6 +17,25 @@ router.get("/", async (req, res) => {
   }
 });
 
+// get random movie
+router.get('/random', async (req, res) => {
+  try {
+    const randomMovie = await Movies.findOne({
+      order: sequelize.literal('RAND()'),
+      attributes: ['id', 'title', 'year']
+    });
+    
+    if (!randomMovie) {
+      return res.status(404).json({ error: 'No movies found' });
+    }
+    
+    res.json(randomMovie);
+  } catch (err) {
+    console.error('Error fetching random movie:', err);
+    res.status(500).json({ error: 'Failed to fetch random movie' });
+  }
+});
+
 // get movie by id
 router.get("/:id", async (req, res) => {
   try {
@@ -29,8 +49,6 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-// get a random movie
 
 
 module.exports = router;

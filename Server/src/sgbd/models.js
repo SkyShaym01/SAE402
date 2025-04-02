@@ -1,17 +1,16 @@
-// src/sgbd/models.js
-const Sequelize = require("sequelize");
+const {DataTypes} = require("sequelize");
 const myDB = require("./config");
 
 const Actors = myDB.define(
   "actors",
   {
     id: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       autoIncrement: true,
       primaryKey: true,
     },
     name: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
@@ -22,12 +21,12 @@ const Genres = myDB.define(
   "genres",
   {
     id: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       autoIncrement: true,
       primaryKey: true,
     },
     genre: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
@@ -38,16 +37,16 @@ const Movies = myDB.define(
   "movies",
   {
     id: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       primaryKey: true,
     },
     title: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true,
     },
     year: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       primaryKey: true,
     },
   },
@@ -58,7 +57,7 @@ const MoviesActors = myDB.define(
   "moviesactors",
   {
     id_movie: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       primaryKey: true,
       references: {
         model: Movies,
@@ -66,7 +65,7 @@ const MoviesActors = myDB.define(
       },
     },
     id_actor: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       primaryKey: true,
       references: {
         model: Actors,
@@ -81,7 +80,7 @@ const MoviesGenres = myDB.define(
   "moviesgenres",
   {
     id_movie: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       primaryKey: true,
       references: {
         model: Movies,
@@ -89,7 +88,7 @@ const MoviesGenres = myDB.define(
       },
     },
     id_genre: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       primaryKey: true,
       references: {
         model: Genres,
