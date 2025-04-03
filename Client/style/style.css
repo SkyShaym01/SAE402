@@ -6,3 +6,11 @@
   outline-color: black;
   outline-width: 2px;
 }
+
+#map {
+  width: 60%;
+  height: 60vh;
+  outline-color: black;
+  outline-width: 2px;
+  outline-style: solid;
+}

@@ -17,6 +17,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+// get random actor
 router.get('/random', async (req, res) => {
   try {
       const randomActor = await Actors.findOne({

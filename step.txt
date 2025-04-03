@@ -1,0 +1,18 @@
+doit avoir un graphique de visualisation
+
+chaque noeud est liée à un film ou un acteur
+
+quand on clique sur un noeud dans un cadre dédier les informations sur l'acteur ou film apparaissent
+
+dans se cadre il y a un cadre de validation
+
+en bas de l'écran se trouve 2 mains, une d'acteur et une de film
+
+glisser une carte dans le validateur déclenche une vérification
+
+si vérification valide noeud change de couleur et débloque des noeuds supplémentaire
+
+si carte non valide retourne dans le deck
+
+repioche une carte au hasard
+

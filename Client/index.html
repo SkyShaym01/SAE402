@@ -1,16 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://unpkg.com/konva@9.3.3/konva.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style/style.css">
-    <title>SAE 402</title>
+    <title>Movie-Actor Association Game (Konva)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        h2, h3 {
+            color: #333;
+        }
+        
+        #graph-container {
+            border: 1px solid #ccc;
+        }
+    </style>
+    <!-- Include D3.js for force simulation -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Include Konva.js for graphics -->
+    <script src="https://unpkg.com/konva@8/konva.min.js"></script>
 </head>
 <body>
-    <button onclick="generateCards()">createCard</button>
-    <button onclick="removeCards()">removeCard</button>
-<div id='container'></div>  
+    <!-- The app will be initialized and rendered via JavaScript -->
+    <script src="script/index.js"></script>
 </body>
-<script src="script/card.js"></script>
 </html>
