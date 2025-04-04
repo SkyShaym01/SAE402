@@ -31,6 +31,7 @@ let connectionLines = new Map(); // Maps connection IDs to Konva line
 document.addEventListener('DOMContentLoaded', async () => {
   createDomStructure();
   initializeKonvaStage();
+  initializeZoom();
   initializeForceSimulation();
   await loadInitialData();
   updateScoreDisplay();
@@ -98,6 +99,22 @@ function createDomStructure() {
   document.body.appendChild(container);
 }
 
+function initializeZoom() {
+  // Create D3 zoom behavior and attach to Konva container
+  d3.select(stage.container())
+    .call(d3.zoom()
+      .scaleExtent([0.1, 10])
+      .on('zoom', (event) => {
+        // Apply transformation directly to the graph layer
+        const { x, y, k } = event.transform;
+        graphLayer.x(x);
+        graphLayer.y(y);
+        graphLayer.scale({ x: k, y: k });
+        graphLayer.batchDraw();
+      })
+    );
+}
+
 function initializeKonvaStage() {
   // Create Konva stage
   stage = new Konva.Stage({
@@ -118,8 +135,8 @@ function initializeKonvaStage() {
 function initializeForceSimulation() {
   // Create force simulation
   simulation = d3.forceSimulation()
-    .force('link', d3.forceLink().id(d => d.id).distance(150))
-    .force('charge', d3.forceManyBody().strength(-300))
+    .force('link', d3.forceLink().id(d => d.id).distance(50))
+    .force('charge', d3.forceManyBody().strength(-30))
     .force('center', d3.forceCenter(STAGE_WIDTH / 2, STAGE_HEIGHT / 2))
     .on('tick', updateKonvaPositions);
 }
