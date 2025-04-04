@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
     const genres = await Genres.findAll();
     res.json({
       message: "All Genres",
-      date: genres
+      data: genres
     });
   } catch (error) {
     console.error("Error fetching genres:", error);

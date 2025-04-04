@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
     const actors = await MoviesActors.findAll();
     res.json({
       message: "All Actors",
-      date: actors
+      data: actors
     });
   } catch (error) {
     console.error("Error fetching actors:", error);

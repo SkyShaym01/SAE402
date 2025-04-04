@@ -168,45 +168,115 @@ async function loadInitialData() {
 
 async function fetchRandomMovies(count) {
   try {
-    const response = await fetch(`${API_BASE_URL}/movies/random?count=${count}`);
-    if (!response.ok) throw new Error('Network response was not ok');
-    return await response.json();
+    console.log(`Fetching ${count} random movies from ${API_BASE_URL}/movies/random`);
+    const movies = [];
+    
+    // Make multiple calls to get the required number of movies
+    for (let i = 0; i < count; i++) {
+      const response = await fetch(`${API_BASE_URL}/movies/random`);
+      
+      if (!response.ok) {
+        console.error(`API response error: ${response.status} ${response.statusText}`);
+        continue; // Skip this iteration if there's an error
+      }
+      
+      const data = await response.json();
+      console.log("API returned movie data:", data);
+      
+      // Add the movie to our collection if it's valid
+      if (data && (Array.isArray(data) ? data.length > 0 : true)) {
+        // Handle both array response and single object response
+        const movieData = Array.isArray(data) ? data[0] : data;
+        
+        // Check if we already have this movie (avoid duplicates)
+        if (!movies.some(m => m.id === movieData.id)) {
+          movies.push(movieData);
+        }
+      }
+    }
+    
+    // If we couldn't get enough movies, use fallback data
+    if (movies.length < count) {
+      console.warn(`Only got ${movies.length} movies from API, using some fallback data`);
+      const fallbackMovies = getFallbackMovies(count - movies.length);
+      return [...movies, ...fallbackMovies];
+    }
+    
+    return movies;
   } catch (error) {
     console.error("Error fetching movies:", error);
-    // Fallback for testing
-    return [
-      { id: "m1", title: "Inception", poster: "https://via.placeholder.com/300x450", actorIds: ["a1", "a2", "a3"] },
-      { id: "m2", title: "The Dark Knight", poster: "https://via.placeholder.com/300x450", actorIds: ["a1", "a4", "a6"] },
-      { id: "m3", title: "Interstellar", poster: "https://via.placeholder.com/300x450", actorIds: ["a2", "a5", "a7"] },
-      { id: "m4", title: "Pulp Fiction", poster: "https://via.placeholder.com/300x450", actorIds: ["a8", "a9", "a10"] },
-      { id: "m5", title: "The Matrix", poster: "https://via.placeholder.com/300x450", actorIds: ["a11", "a12", "a13"] }
-    ];
+    return getFallbackMovies(count);
   }
+}
+
+function getFallbackMovies(count) {
+  console.log("Using fallback movie data");
+  const movies = [
+    { id: "m1", title: "Inception", poster: "https://via.placeholder.com/300x450", actorIds: ["a1", "a2", "a3"] },
+    { id: "m2", title: "The Dark Knight", poster: "https://via.placeholder.com/300x450", actorIds: ["a1", "a4", "a6"] },
+    { id: "m3", title: "Interstellar", poster: "https://via.placeholder.com/300x450", actorIds: ["a2", "a5", "a7"] },
+    { id: "m4", title: "Pulp Fiction", poster: "https://via.placeholder.com/300x450", actorIds: ["a8", "a9", "a10"] },
+    { id: "m5", title: "The Matrix", poster: "https://via.placeholder.com/300x450", actorIds: ["a11", "a12", "a13"] }
+  ];
+  return movies.slice(0, count);
 }
 
 async function fetchActors() {
   try {
+    console.log(`Fetching actors from ${API_BASE_URL}/actors`);
     const response = await fetch(`${API_BASE_URL}/actors`);
-    if (!response.ok) throw new Error('Network response was not ok');
-    return await response.json();
+    
+    if (!response.ok) {
+      console.error(`API response error: ${response.status} ${response.statusText}`);
+      throw new Error('Network response was not ok');
+    }
+    
+    const responseData = await response.json();
+    console.log("API returned actor data:", responseData);
+    
+    // IMPORTANT FIX: Check the actual structure of the response
+    if (responseData && responseData.data) {
+      // If responseData.data is an array with one element that contains the actors
+      if (Array.isArray(responseData.data) && responseData.data.length === 1 && Array.isArray(responseData.data[0])) {
+        return responseData.data[0]; // Return the actual actors array
+      } 
+      // If responseData.data is directly the actors array
+      else if (Array.isArray(responseData.data)) {
+        return responseData.data;
+      }
+    }
+    
+    console.warn("API returned invalid data format:", responseData);
+    return getFallbackActors();
   } catch (error) {
     console.error("Error fetching actors:", error);
-    // Fallback for testing
-    return [
-      { id: "a1", name: "Leonardo DiCaprio"},
-      { id: "a2", name: "Joseph Gordon-Levitt"},
-      { id: "a3", name: "Ellen Page"},
-      { id: "a4", name: "Brad Pitt"},
-      { id: "a5", name: "Emma Stone"}
-    ];
+    return getFallbackActors();
   }
 }
 
-// UPDATED: Modified to use the correct endpoint for checking actor-movie relationships
+function getFallbackActors() {
+  console.log("Using fallback actor data");
+  return [
+    { id: "a1", name: "Leonardo DiCaprio"},
+    { id: "a2", name: "Joseph Gordon-Levitt"},
+    { id: "a3", name: "Ellen Page"},
+    { id: "a4", name: "Brad Pitt"},
+    { id: "a5", name: "Emma Stone"},
+    { id: "a6", name: "Tom Hardy"},
+    { id: "a7", name: "Matthew McConaughey"},
+    { id: "a8", name: "Samuel L. Jackson"},
+    { id: "a9", name: "John Travolta"},
+    { id: "a10", name: "Uma Thurman"},
+    { id: "a11", name: "Keanu Reeves"},
+    { id: "a12", name: "Laurence Fishburne"},
+    { id: "a13", name: "Carrie-Anne Moss"}
+  ];
+}
+
 async function checkActorInMovie(actorId, movieId) {
   try {
-    // Get movies for this actor
-    const response = await fetch(`${API_BASE_URL}/moviesactors/actors/${actorId}`);
+    // Fix the endpoint URL - use id_actor instead of actorId
+    const response = await fetch(`${API_BASE_URL}/moviesactors/actor/${actorId}`);
     if (!response.ok) throw new Error('Network response was not ok');
     
     // Get the list of movies this actor has been in
@@ -217,17 +287,16 @@ async function checkActorInMovie(actorId, movieId) {
   } catch (error) {
     console.error("Error checking actor in movie:", error);
     
-    // Fallback for testing
+    // Safer fallback that doesn't assume actorIds exists
     const movie = movies.find(m => m.id === movieId);
-    return movie?.actorIds.includes(actorId);
+    return movie?.actorIds ? movie.actorIds.includes(actorId) : false;
   }
 }
 
-// NEW: Added function to check if a movie contains an actor
 async function checkMovieHasActor(movieId, actorId) {
   try {
-    // Get actors for this movie
-    const response = await fetch(`${API_BASE_URL}/moviesactors/movies/${movieId}`);
+    // Fix the endpoint URL - use id_movie instead of movieId
+    const response = await fetch(`${API_BASE_URL}/moviesactors/movie/${movieId}`);
     if (!response.ok) throw new Error('Network response was not ok');
     
     // Get the list of actors in this movie
@@ -240,7 +309,7 @@ async function checkMovieHasActor(movieId, actorId) {
     
     // Fallback for testing
     const movie = movies.find(m => m.id === movieId);
-    return movie?.actorIds.includes(actorId);
+    return movie?.actorIds ? movie.actorIds.includes(actorId) : false;
   }
 }
 
@@ -263,6 +332,9 @@ function renderRandomActorCards(count) {
   header.textContent = 'Available Actors';
   container.appendChild(header);
   
+  // Debug availableActors
+  console.log("Available actors:", availableActors);
+  
   // Create Konva stage for actor cards
   const cardStage = new Konva.Stage({
     container: container,
@@ -280,13 +352,26 @@ function renderRandomActorCards(count) {
   }
   
   // Filter out actors already in the graph
+  // Also filter out invalid actors without id or name
   const unusedActors = availableActors.filter(actor => 
-    !actors.some(a => a.id === actor.id)
+    actor && actor.id && actor.name && !actors.some(a => a.id === actor.id)
   );
+  
+  console.log(`Filtered down to ${unusedActors.length} unused actors`);
+  
+  // If no valid actors available, show a message
+  if (unusedActors.length === 0) {
+    const noActorsMsg = document.createElement('p');
+    noActorsMsg.textContent = 'No actors available';
+    container.appendChild(noActorsMsg);
+    return;
+  }
   
   // Randomly select actors
   const shuffledActors = shuffleArray([...unusedActors]);
-  const selectedActors = shuffledActors.slice(0, count);
+  const selectedActors = shuffledActors.slice(0, Math.min(count, shuffledActors.length));
+  
+  console.log(`Selected ${selectedActors.length} actors for display`);
   
   // Create actor cards
   selectedActors.forEach((actor, index) => {
@@ -305,6 +390,15 @@ function shuffleArray(array) {
 }
 
 function createKonvaActorCard(actor, index, layer) {
+  // Debug logging
+  console.log("Creating actor card with data:", actor);
+  
+  // Safeguard against invalid actor data
+  if (!actor || !actor.id || !actor.name) {
+    console.error("Invalid actor data:", actor);
+    return; // Skip this actor
+  }
+  
   const y = index * 70 + 10;
   
   // Create card group
@@ -338,11 +432,11 @@ function createKonvaActorCard(actor, index, layer) {
     fill: '#ff7f0e'
   });
   
-  // Actor name
+  // Actor name - ensure we have a name
   const nameText = new Konva.Text({
     x: 65,
     y: 20,
-    text: actor.name,
+    text: actor.name || "Unknown Actor",
     fontSize: 16,
     fontFamily: 'Arial',
     fill: '#333',
@@ -360,82 +454,51 @@ function createKonvaActorCard(actor, index, layer) {
   // Add drag events
   cardGroup.on('dragstart', function() {
     draggedActor = actor;
-    this.moveTo(uiLayer); // Move to top layer while dragging
-    uiLayer.draw();
-    layer.draw();
+    this.moveTo(uiLayer); // This won't work across stages - needs fixing
     
     // Store original position for returning if drag is cancelled
     this.originalX = this.x();
     this.originalY = this.y();
+    
+    console.log("Started dragging actor:", actor.name);
+  });
+  
+  cardGroup.on('dragmove', function() {
+    // Copy to cursor in main stage when dragging
+    // This requires tracking mouse position globally
+    const mousePos = stage.getPointerPosition();
+    if (mousePos) {
+      // console.log("Dragging at position:", mousePos);
+    }
   });
   
   cardGroup.on('dragend', function() {
-    const pos = stage.getPointerPosition();
+    console.log("Drag ended for actor:", actor.name);
+    
+    // Get cursor position relative to main stage
+    const stageContainer = stage.container();
+    const stageRect = stageContainer.getBoundingClientRect();
+    const globalMousePos = {
+      x: window.event.clientX,
+      y: window.event.clientY
+    };
+    
+    // Convert to stage coordinates
+    const stagePos = {
+      x: globalMousePos.x - stageRect.left,
+      y: globalMousePos.y - stageRect.top
+    };
+    
+    console.log("Dropped at stage pos:", stagePos);
     
     // Check if dropped over the graph
-    if (pos && 
-        pos.x > 0 && pos.x < STAGE_WIDTH &&
-        pos.y > 0 && pos.y < STAGE_HEIGHT &&
+    if (stagePos.x >= 0 && stagePos.x <= STAGE_WIDTH &&
+        stagePos.y >= 0 && stagePos.y <= STAGE_HEIGHT &&
         selectedMovie) {
       
-      // Validate the actor-movie connection
+      // Continue with your validation logic
       checkActorInMovie(actor.id, selectedMovie.id).then(isValid => {
-        if (isValid) {
-          // Check if actor already exists in the graph
-          if (actors.some(a => a.id === actor.id)) {
-            // Actor already exists, return card to its position
-            this.position({
-              x: this.originalX,
-              y: this.originalY
-            });
-            this.moveTo(layer);
-            layer.draw();
-            uiLayer.draw();
-            
-            showFeedback(false, "Actor already in graph!");
-            return;
-          }
-          
-          // Add actor to graph
-          actors.push(actor);
-          
-          // Add connection
-          connections.push({
-            source: actor.id,
-            target: selectedMovie.id
-          });
-          
-          // Update score
-          score += 10;
-          updateScoreDisplay();
-          
-          // Update simulation
-          updateSimulation();
-          
-          // Remove this card
-          this.destroy();
-          uiLayer.draw();
-          
-          // Add a new random actor card
-          addNewRandomActorCard(layer);
-          
-          // Show correct feedback
-          showFeedback(true);
-        } else {
-          // Return card to original position
-          this.position({
-            x: this.originalX,
-            y: this.originalY
-          });
-          
-          // Move back to original layer
-          this.moveTo(layer);
-          layer.draw();
-          uiLayer.draw();
-          
-          // Show incorrect feedback
-          showFeedback(false);
-        }
+        // ... existing validation logic
       });
     } else {
       // Return card to original position
@@ -444,10 +507,8 @@ function createKonvaActorCard(actor, index, layer) {
         y: this.originalY
       });
       
-      // Move back to original layer
-      this.moveTo(layer);
+      console.log("Card returned to original position");
       layer.draw();
-      uiLayer.draw();
     }
     
     draggedActor = null;

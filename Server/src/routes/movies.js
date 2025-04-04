@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
     const movies = await Movies.findAll();
     res.json({
       message: "All Movies",
-      date: movies
+      data: movies
     });
   } catch (error) {
     console.error("Error fetching movies:", error);
