@@ -460,12 +460,11 @@ function createKonvaActorCard(actor, index, layer) {
     this.originalX = this.x();
     this.originalY = this.y();
     
-    console.log("Started dragging actor:", actor.name);
+    // console.log("Started dragging actor:", actor.name);
   });
   
   cardGroup.on('dragmove', function() {
     // Copy to cursor in main stage when dragging
-    // This requires tracking mouse position globally
     const mousePos = stage.getPointerPosition();
     if (mousePos) {
       // console.log("Dragging at position:", mousePos);
@@ -473,7 +472,7 @@ function createKonvaActorCard(actor, index, layer) {
   });
   
   cardGroup.on('dragend', function() {
-    console.log("Drag ended for actor:", actor.name);
+    // console.log("Drag ended for actor:", actor.name);
     
     // Get cursor position relative to main stage
     const stageContainer = stage.container();
@@ -498,7 +497,23 @@ function createKonvaActorCard(actor, index, layer) {
       
       // Continue with your validation logic
       checkActorInMovie(actor.id, selectedMovie.id).then(isValid => {
-        // ... existing validation logic
+        if (isValid) {
+          // Add actor to graph and update score
+          addActorToGraph(actor);
+          connections.push({ source: selectedMovie.id, target: actor.id });
+          score += 10;
+          updateScoreDisplay();
+          showFeedback(true, `${actor.name} added to ${selectedMovie.title}`);
+        } else {
+          // Show feedback for incorrect association
+          showFeedback(false, `${actor.name} is not in ${selectedMovie.title}`);
+          addNewRandomActorCard(layer); // Add a new random actor card
+
+        }
+        
+        // Remove card from UI layer
+        this.destroy();
+        layer.draw();
       });
     } else {
       // Return card to original position
